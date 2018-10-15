@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+        "http://struts.apache.org/dtds/struts-2.3.dtd">
+
+<struts>
+    <package name="default" extends="struts-default" namespace="/">
+	    <interceptors>
+		    <interceptor name="userIntercepter" class="userInterceptor"/>
+	    </interceptors>
+        <action name="*_*" class="{1}" method="{2}">
+            <result name="signUp" type="redirect">/signUp.jsp</result>
+            <result name="signIn" type="redirect">/index.jsp</result>
+	        <result name="info" type="redirect">/info.jsp</result>
+	        <interceptor-ref name="defaultStack"/>
+	        <interceptor-ref name="userIntercepter">
+		        <param name="includeMethods">signUp,changeInfo</param>
+	        </interceptor-ref>
+        </action>
+        
+    </package>
+
+</struts>

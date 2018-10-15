@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<!-- 引入外部文件-jdbc.properties -->
+	<context:property-placeholder location="classpath:jdbc.properties"/>
+	<!-- 托管c3p0数据库连接池 -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+		<property name="driverClass" value="${jdb.driverClass}"/>
+		<property name="jdbcUrl" value="${jdbc.jdbcUrl}"/>
+		<property name="user" value="${jdbc.user}"/>
+		<property name="password" value="${jdbc.password}"/>
+		<!-- 设置数据库连接池的最大连接数 -->
+		<property name="maxPoolSize" value="50"/>
+		<!-- 设置数据库连接池的最小连接数 -->
+		<property name="minPoolSize" value="5"/>
+		<!-- 设置数据库连接池的初始化连接数 -->
+		<property name="initialPoolSize" value="5"/>
+		<!-- 设置数据库连接池的连接最大空闲时间 -->
+		<property name="maxIdleTime" value="20"/>
+		<!-- c3p0缓存Statement的数量数 -->
+		<property name="maxStatements" value="50"/>
+		<!-- 当连接池里面的连接用完的时候,C3P0一次获取新的连接数 -->
+		<property name="acquireIncrement" value="20"/>
+	</bean>
+	<!-- 托管sessionFactory -->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+		<!-- 关联数据连接池 -->
+		<property name="dataSource" ref="dataSource"/>
+		<!-- 配置Hibernate相关属性 -->
+		<property name="hibernateProperties">
+			<props>
+				<!-- 方言 MySQL5InnoDBDialect MySQLDialect -->
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<!-- 自动建表 -->
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<!-- 自动打印sql语句 -->
+				<prop key="hibernate.show_sql">true</prop>
+				<!-- 格式化sql语句 -->
+				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.connection.url">jdbc:mysql://149.28.30.131:3306/proj</prop>
+				<prop key="hibernate.connection.driver_class">com.mysql.jdbc.Driver</prop>
+
+			</props>
+		</property>
+		<!-- 关联映射文件*hbm.xml -->
+		<property name="mappingResources">
+			<list>
+				<value>tw/proj/entity/User.hbm.xml</value>
+			</list>
+		</property>
+		<property name="annotatedClasses">
+			<list>
+				<value>tw.proj.entity.User</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- 托管所有-注解式 @Component @Controller @Service @Repository -->
+	<context:component-scan base-package="tw.proj.*"/>
+
+	<!-- 托管事务管理器-注解式 @Transactional(propagation= Propagation.REQUIRED,rollbackForClassName="Exception") -->
+	<bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	<!-- 开启事务 -->
+	<tx:annotation-driven proxy-target-class="true"/>
+
+</beans>

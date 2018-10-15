@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1">
+	<display-name>myDemo</display-name>
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+
+	<!--配置log4j-->
+	<context-param>
+		<param-name>webAppRootKey</param-name>
+		<!--一个tomcat下的多个项目下方配置不可重复-->
+		<param-value>proj_user.root</param-value>
+	</context-param>
+	<context-param>
+		<!--log4j配置地址 -->
+		<param-name>log4jConfigLocation</param-name>
+		<param-value>/WEB-INF/classes/log4j.properties</param-value>
+	</context-param>
+	<context-param>
+		<!--log4j 配置扫描刷新间隔 可以不用-->
+		<param-name>log4jRefreshInterval</param-name>
+		<param-value>10000</param-value>
+	</context-param>
+	<!--spring里的log4j配置监听器-->
+	<listener>
+		<listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
+	</listener>
+
+	<!-- spring核心监听器 -->
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+
+	<!-- 配置applicationContext.xml -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath:applicationContext.xml</param-value>
+	</context-param>
+
+	<!-- 配置struts2核心过滤器 -->
+	<filter>
+		<filter-name>struts2</filter-name>
+		<filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>struts2</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<!--3天免登陆-->
+	<filter>
+		<filter-name>exempt</filter-name>
+		<filter-class>tw.proj.filter.ExemptFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>exempt</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<!--未登录请求信息页,进行过滤-->
+	<filter>
+		<filter-name>requestInfo</filter-name>
+		<filter-class>tw.proj.filter.RequestInfoFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>requestInfo</filter-name>
+		<url-pattern>/info.jsp</url-pattern>
+	</filter-mapping>
+
+
+</web-app>
